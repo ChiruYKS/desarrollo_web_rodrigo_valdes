@@ -1,0 +1,100 @@
+body {
+  background-color: black;
+  font-family: "Arial", sans-serif;
+  color: white;
+  margin: 20px;
+}
+
+h1 {
+  font-family: "Epunda Slab";
+  color: white;
+  text-align: center;
+}
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+  margin-top: 20px;
+}
+
+th, td {
+  border: 1px solid #333;
+  padding: 8px;
+  text-align: center;
+}
+
+    table {
+      border-collapse: collapse;
+      width: 100%;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 8px;
+      text-align: center;
+    }
+
+    #detailView {
+      display: none;
+      margin-top: 20px;
+      padding: 20px;
+      border: 2px solid #ccc;
+      border-radius: 10px;
+    }
+
+    #detailView table {
+      width: auto;
+      border: none;
+    }
+
+    #detailView th, #detailView td {
+      border: none;
+      padding: 10px;
+      text-align: left;
+    }
+
+    .btn {
+      background-color: #ff69b4;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 8px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-right: 10px;
+      transition: all 0.3s;
+    }
+
+    .btn:hover {
+      background-color: #ff85c1;
+    }
+
+    .pet-img {
+      width: 320px;
+      height: 240px;
+      object-fit: cover;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .img-expanded {
+      width: 800px;  
+      height: 600px; 
+      display: block;
+      margin-bottom: 10px;
+    }
+
+    .close-img {
+      display: none;
+      margin-top: 10px;
+    }
+
+    #listingTable tbody tr:hover {
+      outline: 2px solid white;
+      cursor: pointer;
+    }
+
+    #listingTable th:hover {
+      outline: none;
+      background: inherit;
+}

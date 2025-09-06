@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Formulario</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<!-- BOTON PARA VOLVER AL MENU PRINCIPAL -->
+<button 
+  style="position: fixed; bottom: 20px; left: 20px; 
+       background-color: #ff69b4; color: white; 
+       border: none; padding: 12px 20px; border-radius: 12px; 
+       font-weight: bold; cursor: pointer; transition: all 0.3s;"
+  onclick="window.location.href='index.html'">
+  Volver
+</button>
+
+<h1>Agregar Aviso</h1>
+
+<form id="myForm" action="#" method="post" onsubmit="return validateForm()">
+
+  <!-- TABLA UBICACION -->
+  <table>
+    <thead>
+      <tr>
+        <th colspan="2" style="text-align:center; font-size:18px;">Ubicación</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Región:</td>
+        <td>
+          <select id="region" name="region" onchange="updateComunas()">
+            <option value="">--Seleccione una región--</option>
+          </select>
+        </td>
+      </tr>
+      <tr>
+        <td>Comuna:</td>
+        <td>      
+          <select id="comuna" name="comuna">
+            <option value="">--Seleccione una comuna--</option>
+          </select>
+        </td>
+      </tr>
+      <tr>
+        <td>Sector:</td>
+        <td>
+          <input type="text" id="sector" name="sector" placeholder="Introduzca un sector">
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- TABLA CONTACTO -->
+  <table>
+    <thead>
+      <tr>
+        <th colspan="2" style="text-align:center; font-size:18px;">Contacto</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Nombre:</td>
+        <td><input type="text" id="nombre" name="nombre" placeholder="Introduzca un nombre"></td>
+      </tr>
+      <tr>
+        <td>Email:</td>
+        <td><input type="email" id="email" name="email" placeholder="Introduzca un email"></td>
+      </tr>
+      <tr>
+        <td>Número de celular:</td>
+        <td><input type="tel" id="tel" name="tel" placeholder="Ejemplo: +123.45678901"></td>
+      </tr>
+      <tr>
+        <td>Contactar por:</td>
+        <td>
+          <select id="contactSelect" name="contactSelect" onchange="updateContact()">
+            <option value="">--Seleccione un medio--</option>
+            <option value="Whatsapp">Whatsapp</option>
+            <option value="Telegram">Telegram</option>
+            <option value="Twitter">Twitter</option>
+            <option value="Instagram">Instagram</option>
+            <option value="TikTok">TikTok</option>
+            <option value="Otra">Otra</option>
+          </select>
+        </td>
+      </tr>
+      <tr id="contactRow" style="display:none;">
+        <td><div id="contactLetter"></div></td>
+        <td><input type="text" id="contactInput" name="contactInput" placeholder="ID/URL" maxlength="50"></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- TABLA MASCOTA EN ADOPCION -->
+  <table>
+    <thead>
+      <tr>
+        <th colspan="2" style="text-align:center; font-size:18px;">Qué mascota ofrece en adopción?</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Tipo:</td>
+        <td>
+          <select id="simpleSelect" name="simpleSelect">
+            <option value="">--Seleccione el tipo de animal--</option>
+            <option value="Gato">Gato</option>
+            <option value="Perro">Perro</option>
+          </select>
+        </td>
+      </tr>
+      <tr>
+        <td>Cantidad:</td>
+        <td><input type="number" id="int1" name="int1" placeholder="Ingrese un número entero"></td>
+      </tr>
+      <tr>
+        <td>Edad:</td>
+        <td><input type="number" id="int2" name="int2" placeholder="Ingrese un número entero"></td>
+      </tr>
+      <tr>
+        <td>Unidad de medida de la Edad:</td>
+        <td>
+          <select id="simpleSelect2" name="simpleSelect2">
+            <option value="">--Seleccione la medida de edad--</option>
+            <option value="Meses">Meses</option>
+            <option value="Años">Años</option>
+          </select>
+        </td>
+      </tr>
+      <tr>
+        <td>Fecha disponible para entrega:</td>
+        <td><input type="datetime-local" id="entrega" name="entrega"></td>
+      </tr>
+      <tr>
+        <td>Descripción:</td>
+        <td>
+          <textarea id="descripcion" name="descripcion" cols="50" rows="10" placeholder="Escriba la descripción aquí..."></textarea>
+        </td>
+      </tr>
+      <tr>
+        <td>Foto:</td>
+        <td>
+          <div id="fileContainer">
+            <input type="file" name="fotos" accept="image/*">
+          </div>
+          <button type="button" id="addFileBtn">Agregar otra imagen</button>
+          <small>Puede subir hasta 5 imágenes.</small>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="2" style="text-align:center;">
+          <input type="submit" value="Agregar este aviso de adopción">
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+</form>
+
+<script src="region_comuna.js"></script>
+<script src="logica_formulario.js"></script>  
+
+</body>
+</html>

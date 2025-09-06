@@ -1,0 +1,68 @@
+body {
+  background-color: black;
+  color: white;
+  font-family: Arial, sans-serif;
+  padding: 20px;
+}
+
+h1 {
+  font-family: "Epunda Slab";
+  color: #ff69b4;
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+form {
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: #222;
+}
+
+th, td {
+  padding: 12px;
+  border: 1px solid #666;
+  text-align: left;
+  color: white;
+}
+
+th {
+  background-color: #444;
+}
+
+    select, input[type="text"], input[type="submit"] {
+      width: 100%;
+      padding: 8px;
+      border-radius: 8px;
+      border: none;
+      margin-top: 4px;
+      box-sizing: border-box;
+    }
+
+    input[type="submit"] {
+      background-color: #ff69b4;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    input[type="submit"]:hover {
+      background-color: #ff85c1;
+      outline: 2px solid white;
+    }
+
+    textarea {
+      width: 100%;           /* make it fill the table cell */
+      max-width: 600px;      /* optional max width */
+      padding: 8px;  
+      font-family: Arial, sans-serif;        
+      font-size: 14px;       
+      border-radius: 6px;
+      border: 1px solid #666;
+      box-sizing: border-box;
+    }

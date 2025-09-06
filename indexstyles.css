@@ -1,0 +1,45 @@
+body {
+  background-color: black;
+  font-family: "Arial", sans-serif;
+  color: white;
+  margin: 20px;
+}
+
+h1 {
+  font-family: "Epunda Slab";
+  color: white;
+  text-align: center;
+}
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+  margin-top: 20px;
+}
+
+th, td {
+  border: 1px solid #333;
+  padding: 8px;
+  text-align: center;
+}
+
+.custom-button {
+  background-color: #ff69b4; 
+  color: white;
+  border: none;
+  padding: 20px 50px;
+  border-radius: 50px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  margin: 50px auto;
+  display: block; 
+  width: 500px;
+  align-items: center; 
+}
+
+.custom-button:hover {
+  background-color: #ff85c1;  
+  outline: 2px solid white;   
+  outline-offset: 4px;         
+}

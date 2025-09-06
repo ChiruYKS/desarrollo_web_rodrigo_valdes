@@ -1,0 +1,67 @@
+
+<script>
+  // Map regions to their cities
+  const citiesByRegion = {
+    region1: ["City 1A", "City 1B"],
+    region2: ["City 2A", "City 2B"],
+    region3: ["City 3A", "City 3B"],
+    region4: ["City 4A", "City 4B"],
+    region5: ["City 5A", "City 5B"]
+  };
+
+  function updateCities() {
+    const regionSelect = document.getElementById("region");
+    const citySelect = document.getElementById("city");
+    const selectedRegion = regionSelect.value;
+
+    // Clear previous options
+    citySelect.innerHTML = '<option value="">--Select a city--</option>';
+
+    if (selectedRegion !== "" && citiesByRegion[selectedRegion]) {
+      citiesByRegion[selectedRegion].forEach(city => {
+        const option = document.createElement("option");
+        option.value = city;
+        option.text = city;
+        citySelect.appendChild(option);
+      });
+    }
+  }
+
+  // Optional: validate city selection along with region
+  function validateForm() {
+    const region = document.getElementById("region").value;
+    const city = document.getElementById("city").value;
+
+    if (region === "") {
+      alert("Please select a region.");
+      return false;
+    }
+    if (city === "") {
+      alert("Please select a city.");
+      return false;
+    }
+    return true;
+  }
+</script>
+
+<tr>
+  <td>Region</td>
+  <td>
+    <select id="region" name="region" onchange="updateCities()">
+      <option value="">--Select a region--</option>
+      <option value="region1">Region 1</option>
+      <option value="region2">Region 2</option>
+      <option value="region3">Region 3</option>
+      <option value="region4">Region 4</option>
+      <option value="region5">Region 5</option>
+    </select>
+  </td>
+</tr>
+<tr>
+  <td>City</td>
+  <td>
+    <select id="city" name="city">
+      <option value="">--Select a city--</option>
+    </select>
+  </td>
+</tr>
