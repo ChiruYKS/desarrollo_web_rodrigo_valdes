@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Listado de Avisos de Adopción</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='stylesheets/avisostyles.css') }}">
+</head>
+<body>
+
+<button onclick="window.location.href='{{ url_for('portada') }}'">Volver</button>
+
+<h1>Listado de Avisos</h1>
+
+<table id="listingTable">
+  <tr>
+    <th>Fecha Publicación</th> 
+    <th>Fecha Entrega</th> 
+    <th>Comuna</th> 
+    <th>Sector</th> 
+    <th>Cantidad, Tipo, edad</th> 
+    <th>Nombre Contacto </th> 
+    <th>Total Fotos</th>
+  </tr>
+  {% for aviso in avisos %}
+    <tr data-aviso-id="{{ aviso.id }}">
+      <td>{{ aviso.fecha_ingreso.strftime('%Y-%m-%d %H:%M') }}</td>
+      <td>{{ aviso.fecha_entrega.strftime('%Y-%m-%d %H:%M') }}</td>
+      <td>{{ aviso.comuna.nombre }}</td>
+      <td>{{ aviso.sector }}</td>
+      <td>{{ aviso.cantidad }}, {{ aviso.tipo }}, {{ aviso.edad }} {{ 'años' if aviso.unidad_medida=='a' else 'meses' }}</td>
+      <td>
+        {% if aviso.contactos|length > 0 %}
+          {{ aviso.contactos[0].identificador }}
+        {% else %}
+          -
+        {% endif %}
+      </td>
+      <td>
+        {% if aviso.fotos|length > 0 %}
+          <img src="{{ url_for('static', filename=aviso.fotos[0].ruta_archivo) }}" width="50">
+        {% else %}
+          -
+        {% endif %}
+      </td>
+    </tr>
+  {% endfor %}
+</table>
+
+<!-- Paginación -->
+<div id="pagination">
+  {% if page > 1 %}
+    <a href="{{ url_for('listado_avisos', page=page-1) }}">Anterior</a>
+  {% endif %}
+  Página {{ page }} de {{ total_pages }}
+  {% if page < total_pages %}
+    <a href="{{ url_for('listado_avisos', page=page+1) }}">Siguiente</a>
+  {% endif %}
+</div>
+
+<!-- Detalle -->
+<div id="detailView" style="display:none;">
+  <button onclick="showListing()">Volver al listado</button>
+  <div id="detailContent"></div>
+</div>
+
+<script>
+const rows = document.querySelectorAll("#listingTable tr[data-aviso-id]");
+const listingTable = document.getElementById("listingTable");
+const detailView = document.getElementById("detailView");
+const detailContent = document.getElementById("detailContent");
+
+rows.forEach(row => {
+  row.addEventListener("click", () => {
+    const avisoId = row.dataset.avisoId;
+
+    fetch(`/detalle_aviso/${avisoId}/`)
+      .then(resp => resp.json())
+      .then(data => {
+        let fotosHTML = '';
+        data.fotos.forEach(f => {
+          fotosHTML += `<img src="/static/${f}" width="100"> `;
+        });
+
+        detailContent.innerHTML = `
+          <table>
+            <tr><th>Fecha Publicación:</th><td>${data.fecha_ingreso}</td></tr>
+            <tr><th>Fecha Entrega:</th><td>${data.fecha_entrega}</td></tr>
+            <tr><th>Comuna:</th><td>${data.comuna}</td></tr>
+            <tr><th>Sector:</th><td>${data.sector}</td></tr>
+            <tr><th>Cantidad/Tipo/Edad:</th><td>${data.cantidad_tipo_edad}</td></tr>
+            <tr><th>Contacto:</th><td>${data.contactos.join(', ')}</td></tr>
+            <tr><th>Fotos:</th><td>${fotosHTML}</td></tr>
+          </table>
+        `;
+        listingTable.style.display = "none";
+        detailView.style.display = "block";
+      });
+  });
+});
+
+function showListing() {
+  detailView.style.display = "none";
+  listingTable.style.display = "table";
+}
+</script>
+
+</body>
+</html>
