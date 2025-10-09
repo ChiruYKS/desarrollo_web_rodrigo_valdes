@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Agregar Aviso de Adopción</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='stylesheets/styles.css') }}">
+</head>
+<body>
+
+<!-- Botón para volver al menú principal -->
+<button style="position: fixed; bottom: 20px; left: 20px; 
+               background-color: #ff69b4; color: white; border: none; 
+               padding: 12px 20px; border-radius: 12px; font-weight: bold; cursor: pointer; transition: all 0.3s;"
+        onclick="window.location.href='{{ url_for('portada') }}'">
+  Volver
+</button>
+
+<h1>Agregar Aviso de Adopción</h1>
+
+<!-- Mensajes flash -->
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <ul class="flash-messages">
+      {% for category, message in messages %}
+        <li class="flash {{ category }}">{{ message }}</li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+{% endwith %}
+
+<form id="myForm" action="{{ url_for('add_aviso') }}" method="post" enctype="multipart/form-data">
+
+  <!-- Ubicación -->
+  <table>
+    <thead>
+      <tr><th colspan="2" style="text-align:center;">Ubicación</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Región:</td>
+        <td>
+          <select id="region" name="region" onchange="updateComunas()">
+            <option value="">--Seleccione una región--</option>
+            {% for region in regiones_data %}
+              <option value="{{ region.id }}" {% if request.form.get('region')|int == region.id %}selected{% endif %}>
+                {{ region.nombre }}
+              </option>
+            {% endfor %}
+          </select>
+        </td>
+      </tr>
+      <tr>
+        <td>Comuna:</td>
+        <td>
+          <select id="comuna" name="comuna">
+            <option value="">--Seleccione una comuna--</option>
+            {% if request.form.get('region') %}
+              {% set selected_region = regiones_data|selectattr("id","equalto",request.form.get('region')|int)|first %}
+              {% for comuna in selected_region.comunas %}
+                <option value="{{ comuna.id }}" {% if request.form.get('comuna')|int == comuna.id %}selected{% endif %}>
+                  {{ comuna.nombre }}
+                </option>
+              {% endfor %}
+            {% endif %}
+          </select>
+        </td>
+      </tr>
+      <tr>
+        <td>Sector:</td>
+        <td><input type="text" id="sector" name="sector" maxlength="100" value="{{ request.form.get('sector','') }}"></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- Contacto -->
+  <table>
+    <thead>
+      <tr><th colspan="2" style="text-align:center;">Contacto</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Nombre:</td>
+        <td><input type="text" id="nombre" name="nombre" value="{{ request.form.get('nombre','') }}"></td>
+      </tr>
+      <tr>
+        <td>Email:</td>
+        <td><input type="email" id="email" name="email" value="{{ request.form.get('email','') }}"></td>
+      </tr>
+      <tr>
+        <td>Celular:</td>
+        <td><input type="tel" id="tel" name="tel" value="{{ request.form.get('tel','') }}"></td>
+      </tr>
+      <tr>
+        <td>Contactar por:</td>
+        <td>
+          <select id="contactSelect" name="contactSelect" onchange="updateContact()">
+            <option value="">--Seleccione un medio--</option>
+            {% for medio in ['whatsapp','telegram','X','instagram','tiktok','otra'] %}
+              <option value="{{ medio }}" {% if request.form.get('contactSelect') == medio %}selected{% endif %}>{{ medio|capitalize }}</option>
+            {% endfor %}
+          </select>
+        </td>
+      </tr>
+      <tr id="contactRow" style="display: {% if request.form.get('contactSelect') %}table-row{% else %}none{% endif %};">
+        <td><div id="contactLetter">{{ request.form.get('contactSelect','') }}</div></td>
+        <td><input type="text" id="contactInput" name="contactInput" maxlength="50" value="{{ request.form.get('contactInput','') }}"></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- Mascota -->
+  <table>
+    <thead>
+      <tr><th colspan="2" style="text-align:center;">Mascota</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Tipo:</td>
+        <td>
+          <select id="simpleSelect" name="simpleSelect">
+            <option value="">--Seleccione tipo--</option>
+            <option value="gato" {% if request.form.get('simpleSelect')=='gato' %}selected{% endif %}>Gato</option>
+            <option value="perro" {% if request.form.get('simpleSelect')=='perro' %}selected{% endif %}>Perro</option>
+          </select>
+        </td>
+      </tr>
+      <tr>
+        <td>Cantidad:</td>
+        <td><input type="number" id="int1" name="int1" min="1" value="{{ request.form.get('int1','') }}"></td>
+      </tr>
+      <tr>
+        <td>Edad:</td>
+        <td><input type="number" id="int2" name="int2" min="1" value="{{ request.form.get('int2','') }}"></td>
+      </tr>
+      <tr>
+        <td>Unidad de medida:</td>
+        <td>
+          <select id="simpleSelect2" name="simpleSelect2">
+            <option value="">--Seleccione medida--</option>
+            <option value="Años" {% if request.form.get('simpleSelect2')=='Años' %}selected{% endif %}>Años</option>
+            <option value="Meses" {% if request.form.get('simpleSelect2')=='Meses' %}selected{% endif %}>Meses</option>
+          </select>
+        </td>
+      </tr>
+      <tr>
+        <td>Fecha disponible:</td>
+        <td><input type="datetime-local" id="entrega" name="entrega" value="{{ request.form.get('entrega','') }}"></td>
+      </tr>
+      <tr>
+        <td>Descripción:</td>
+        <td><textarea id="descripcion" name="descripcion" cols="50" rows="5">{{ request.form.get('descripcion','') }}</textarea></td>
+      </tr>
+      <tr>
+        <td>Fotos:</td>
+        <td>
+          <div id="fileContainer">
+            <input type="file" name="fotos" accept="image/*">
+          </div>
+          <button type="button" id="addFileBtn">Agregar otra imagen</button>
+          <small>Hasta 5 imágenes</small>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="2" style="text-align:center;">
+          <input type="submit" value="Agregar aviso">
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+</form>
+
+<script>
+  // Convertimos regiones_data a JSON para JS
+  const regionesData = {{ regiones_data|tojson }};
+
+  function updateComunas() {
+    const regionId = parseInt(document.getElementById("region").value);
+    const comunaSelect = document.getElementById("comuna");
+    comunaSelect.innerHTML = '<option value="">--Seleccione una comuna--</option>';
+
+    if (!regionId) return;
+
+    const region = regionesData.find(r => r.id === regionId);
+    if (region) {
+      region.comunas.forEach(c => {
+        const option = document.createElement("option");
+        option.value = c.id;
+        option.text = c.nombre;
+        comunaSelect.appendChild(option);
+      });
+    }
+  }
+
+  function updateContact() {
+    const select = document.getElementById("contactSelect");
+    const contactRow = document.getElementById("contactRow");
+    const contactLetter = document.getElementById("contactLetter");
+    const contactInput = document.getElementById("contactInput");
+
+    if (select.value) {
+      contactRow.style.display = "table-row";
+      contactLetter.textContent = select.options[select.selectedIndex].text;
+      contactInput.value = "";
+    } else {
+      contactRow.style.display = "none";
+    }
+  }
+
+  // Prefill fecha disponible
+  window.addEventListener("load", () => {
+    const entregaInput = document.getElementById("entrega");
+    if (!entregaInput.value) {
+      const now = new Date();
+      now.setHours(now.getHours() + 3);
+      const yyyy = now.getFullYear();
+      const mm = String(now.getMonth()+1).padStart(2,'0');
+      const dd = String(now.getDate()).padStart(2,'0');
+      const hh = String(now.getHours()).padStart(2,'0');
+      const mi = String(now.getMinutes()).padStart(2,'0');
+      entregaInput.value = `${yyyy}-${mm}-${dd}T${hh}:${mi}`;
+    }
+  });
+
+  // Agregar inputs de archivo
+  const maxFiles = 5;
+  const fileContainer = document.getElementById("fileContainer");
+  const addFileBtn = document.getElementById("addFileBtn");
+  addFileBtn.addEventListener("click", () => {
+    const currentInputs = fileContainer.querySelectorAll('input[type="file"]');
+    if (currentInputs.length < maxFiles) {
+      const newInput = document.createElement("input");
+      newInput.type = "file";
+      newInput.name = "fotos";
+      newInput.accept = "image/*";
+      newInput.style.display = "block";
+      newInput.style.marginTop = "5px";
+      fileContainer.appendChild(newInput);
+    } else {
+      alert("No puede agregar más de 5 imágenes.");
+    }
+  });
+</script>
+</body>
+</html>
