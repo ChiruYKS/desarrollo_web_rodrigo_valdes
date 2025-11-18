@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Portada</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="{{ url_for('static', filename='stylesheets/indexstyles.css') }}">
+</head>
+<body>
+
+  <h1>Bienvenido al mundo de los Gatiperros 🐱🐶</h1>
+
+  <p style="margin-bottom: 50px; text-align: center;">
+    <i><b>¿Qué desea hacer?</b></i>
+  </p>
+
+  <!-- Botones principales -->
+  <div style="text-align: center; margin-bottom: 40px;">
+    <button class="custom-button" style="background-color: #a1261a;"
+            type="button"
+            onclick="window.location.href='{{ url_for('agregar_aviso_form') }}'">
+      Agregar aviso de adopción
+    </button>
+
+    <button class="custom-button" style="background-color: #222a52;"
+            type="button"
+            onclick="window.location.href='{{ url_for('listado_avisos') }}'">
+      Ver listado de adopciones
+    </button>
+  </div>
+
+  <p style="font-size: 20px; text-decoration: underline; text-align: center;">
+    <b>Últimos avisos:</b>
+  </p>
+
+  <!-- Tabla dinámica -->
+  <table>
+    <thead>
+      <tr>
+        <th>Fecha publicación</th>
+        <th>Comuna</th>
+        <th>Sector</th>
+        <th>Cantidad, Tipo, Edad</th>
+        <th>Foto</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for aviso in avisos %}
+      <tr>
+        <td>{{ aviso.fecha_ingreso.strftime('%Y-%m-%d %H:%M') }}</td>
+        <td>{{ aviso.comuna.nombre }}</td>
+        <td>{{ aviso.sector or '-' }}</td>
+        <td>
+          {{ aviso.cantidad }}, {{ aviso.tipo }}, 
+          {{ aviso.edad }} {% if aviso.unidad_medida == 'a' %}años{% else %}meses{% endif %}
+        </td>
+        <td>
+          {% if aviso.fotos %}
+            <img src="{{ url_for('static', filename=aviso.fotos[0].ruta_archivo) }}" 
+                 alt="{{ aviso.tipo }}" width="80">
+          {% else %}
+            Sin foto
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+</body>
+</html>

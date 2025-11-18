@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Estadísticas de Adopciones</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://code.highcharts.com/highcharts.js"></script>
+  <script src="https://code.highcharts.com/modules/exporting.js"></script>
+  <style>
+    body {
+      margin: 20px;
+      background-color: #f9f9f9;
+    }
+    h1 {
+      text-align: center;
+    }
+    .chart-container {
+      margin: 40px 0;
+    }
+    .volver {
+      display: inline-block;
+      padding: 6px 12px;
+      background-color: #ff69b4;
+      color: #ffffff;
+      border-radius: 6px;
+      text-decoration: none;
+      text-align: center;
+    }
+    .volver:hover {
+      background-color: #ff85c1;
+    }
+    .volver-container {
+      text-align: center;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Estadísticas de Avisos de Adopción</h1>
+
+  <div class="chart-container" id="chart1"></div>
+  <div class="chart-container" id="chart2"></div>
+  <div class="chart-container" id="chart3"></div>
+
+  <div class="volver-container">
+    <a href="{{ url_for('portada') }}" class="volver">Volver a la Portada</a>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      fetch('/api/estadisticas/')
+        .then(function (response) {
+          return response.json();
+        })
+        .then(function (data) {
+          Highcharts.chart('chart1', {
+            chart: { type: 'line' },
+            title: { text: 'Cantidad de avisos por día' },
+            xAxis: { categories: data.line_chart.fechas, title: { text: 'Día' } },
+            yAxis: { title: { text: 'Cantidad de avisos' } },
+            series: [{
+              name: 'Avisos',
+              data: data.line_chart.cantidades
+            }]
+          });
+
+          Highcharts.chart('chart2', {
+            chart: { type: 'pie' },
+            title: { text: 'Distribución por tipo de mascota' },
+            series: [{
+              name: 'Total',
+              colorByPoint: true,
+              data: data.pie_chart
+            }]
+          });
+
+          Highcharts.chart('chart3', {
+            chart: { type: 'column' },
+            title: { text: 'Avisos por mes y tipo de mascota' },
+            xAxis: { categories: data.bar_chart.meses, title: { text: 'Mes' } },
+            yAxis: { title: { text: 'Cantidad de avisos' } },
+            series: [
+              { name: 'Gatos', data: data.bar_chart.gatos },
+              { name: 'Perros', data: data.bar_chart.perros }
+            ]
+          });
+        })
+        .catch(function (error) {
+          console.error('Error al cargar datos de estadísticas:', error);
+        });
+    });
+  </script>
+
+</body>
+</html>

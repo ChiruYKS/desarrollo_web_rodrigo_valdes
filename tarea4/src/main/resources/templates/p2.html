@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Listado de Avisos de Adopción</title>
+  <link rel="stylesheet" th:href="@{/static/stylesheets/avisostyles.css}">
+</head>
+<body>
+
+<button type="button" th:onclick="'window.location.href=\'' + @{/portada/} + '\'"'>Volver</button>
+
+<h1>Listado de Avisos</h1>
+
+<table id="listingTable">
+  <thead>
+    <tr>
+      <th>Fecha Publicación</th>
+      <th>Fecha Entrega</th>
+      <th>Comuna</th>
+      <th>Sector</th>
+      <th>Cantidad, Tipo, Edad</th>
+      <th>Nombre Contacto</th>
+      <th>Total Fotos</th>
+      <th>Nota</th>
+      <th></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <tr th:each="aviso : ${avisos}"
+        th:attr="data-aviso-id=${aviso.id}">
+      <td th:text="${#dates.format(aviso.fechaIngreso,'yyyy-MM-dd HH:mm')}"></td>
+      <td th:text="${#dates.format(aviso.fechaEntrega,'yyyy-MM-dd HH:mm')}"></td>
+
+      <td th:text="${aviso.comuna.nombre}"></td>
+      <td th:text="${aviso.sector}"></td>
+
+      <td>
+        <span th:text="${aviso.cantidad}"></span>,
+        <span th:text="${aviso.tipo}"></span>,
+        <span th:text="${aviso.edad}"></span>
+        <span th:text="${aviso.unidadMedida == 'a' ? 'años' : 'meses'}"></span>
+      </td>
+
+      <td>
+        <span th:if="${aviso.contactos.size() > 0}"
+              th:text="${aviso.contactos.get(0).identificador}"></span>
+        <span th:if="${aviso.contactos.size() == 0}">-</span>
+      </td>
+
+      <td>
+        <img th:if="${aviso.fotos.size() > 0}"
+             th:src="@{'/static/' + ${aviso.fotos.get(0).rutaArchivo}}"
+             width="50" alt="Foto aviso">
+        <span th:if="${aviso.fotos.size() == 0}">-</span>
+      </td>
+
+      <!-- Mostrar nota promedio -->
+      <td th:text="${aviso.promedioNota != null ? aviso.promedioNota : '-'}"></td>
+
+      <!-- link AJAX -->
+      <td>
+        <a href="#" th:attr="data-id=${aviso.id}" class="evaluar-link">evaluar</a>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<!-- Paginación -->
+<div id="pagination">
+  <a th:if="${page > 1}" th:href="@{/listado_avisos/(page=${page-1})}">Anterior</a>
+  Página <span th:text="${page}"></span> de <span th:text="${totalPages}"></span>
+  <a th:if="${page < totalPages}" th:href="@{/listado_avisos/(page=${page+1})}">Siguiente</a>
+</div>
+
+
+<script>
+// Cuando clickean “evaluar”
+document.addEventListener("click", function(e) {
+  if (e.target.classList.contains("evaluar-link")) {
+    e.preventDefault();
+
+    const avisoId = e.target.dataset.id;
+
+    const nota = prompt("Ingrese una nota entre 1 y 7:");
+
+    if (nota === null) return;
+
+    const n = parseInt(nota.trim());
+    if (isNaN(n) || n < 1 || n > 7) {
+      alert("La nota debe ser un número entero entre 1 y 7.");
+      return;
+    }
+
+    // Enviar por AJAX a Spring Boot
+    fetch(`/add_nota/${avisoId}/`, {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({ nota: n })
+    })
+    .then(r => r.json())
+    .then(data => {
+      if (data.success) {
+        // Actualizar la celda
+        const row = document.querySelector(`tr[data-aviso-id="${avisoId}"]`);
+        const notaCell = row.querySelector("td:nth-child(8)");
+        notaCell.textContent = data.promedio;
+      } else {
+        alert("Error: " + data.message);
+      }
+    });
+  }
+});
+</script>
+
+<script>
+let currentAvisoId = null;
+
+const rows = document.querySelectorAll("#listingTable tbody tr[data-aviso-id]");
+const listingTable = document.getElementById("listingTable");
+const detailView = document.getElementById("detailView");
+const detailContent = document.getElementById("detailContent");
+
+rows.forEach(row => {
+  row.addEventListener("click", () => {
+    currentAvisoId = row.dataset.avisoId;
+
+    fetch(`/detalle_aviso/${currentAvisoId}/`)
+      .then(resp => resp.json())
+      .then(data => {
+        let fotosHTML = '';
+        data.fotos.forEach(f => {
+          fotosHTML += `<img src="/static/${f}" width="100" alt="Foto aviso"> `;
+        });
+
+        detailContent.innerHTML = `
+          <table>
+            <tr><th>Fecha Publicación:</th><td>${data.fecha_ingreso}</td></tr>
+            <tr><th>Fecha Entrega:</th><td>${data.fecha_entrega}</td></tr>
+            <tr><th>Comuna:</th><td>${data.comuna}</td></tr>
+            <tr><th>Sector:</th><td>${data.sector}</td></tr>
+            <tr><th>Cantidad/Tipo/Edad:</th><td>${data.cantidad_tipo_edad}</td></tr>
+            <tr><th>Contacto:</th><td>${data.contactos.join(', ')}</td></tr>
+            <tr><th>Fotos:</th><td>${fotosHTML}</td></tr>
+          </table>
+
+          <div id="comentariosSection">
+            <h3>Comentarios</h3>
+            <ul id="comentariosList"></ul>
+
+            <h4>Agregar Comentario</h4>
+            <form id="comentarioForm">
+              <label for="comentarioNombre">Nombre:</label>
+              <input type="text" id="comentarioNombre" name="nombre" required minlength="3" maxlength="80">
+
+              <label for="comentarioTexto">Comentario:</label>
+              <textarea id="comentarioTexto" name="texto" rows="4" cols="50" required minlength="5"></textarea>
+
+              <button type="submit">Agregar comentario</button>
+            </form>
+            <div id="comentarioErrors" style="color:red;"></div>
+          </div>
+        `;
+        listingTable.style.display = "none";
+        detailView.style.display = "block";
+        loadComentarios(currentAvisoId);
+      });
+  });
+});
+
+function loadComentarios(avisoId) {
+  fetch(`/get_comentarios/${avisoId}/`)
+    .then(resp => resp.json())
+    .then(data => {
+      const list = document.getElementById("comentariosList");
+      list.innerHTML = "";
+      data.forEach(c => {
+        const li = document.createElement("li");
+        li.textContent = `[${c.fecha}] ${c.nombre}: ${c.texto}`;
+        list.appendChild(li);
+      });
+    });
+}
+
+document.addEventListener("submit", function(e) {
+  if(e.target && e.target.id === "comentarioForm"){
+    e.preventDefault();
+    const avisoId = currentAvisoId;
+    const nombre = document.getElementById("comentarioNombre").value.trim();
+    const texto = document.getElementById("comentarioTexto").value.trim();
+    const errorDiv = document.getElementById("comentarioErrors");
+    errorDiv.textContent = "";
+
+    fetch(`/add_comentario/${avisoId}/`, {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({nombre, texto})
+    })
+    .then(resp => resp.json().then(data => ({status: resp.status, body: data})))
+    .then(result => {
+      if(result.status === 200 && result.body.success){
+        document.getElementById("comentarioNombre").value = "";
+        document.getElementById("comentarioTexto").value = "";
+        loadComentarios(avisoId);
+      } else {
+        errorDiv.textContent = result.body.errors.join(", ");
+      }
+    })
+    .catch(err => errorDiv.textContent = "Error al enviar comentario.");
+  }
+});
+
+function showListing() {
+  detailView.style.display = "none";
+  listingTable.style.display = "table";
+}
+</script>
+
+</body>
+</html>

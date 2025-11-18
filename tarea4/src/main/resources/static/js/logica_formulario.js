@@ -16,20 +16,22 @@
     function updateComunas() {
       const regionSelect = document.getElementById("region");
       const comunaSelect = document.getElementById("comuna");
-      const selectedRegion = regionSelect.value;
+      const selectedRegionId = parseInt(regionSelect.value);
 
       comunaSelect.innerHTML = '<option value="">--Seleccione una comuna--</option>';
 
-      if (selectedRegion !== "") {
-        const region = region_comuna.regiones.find(r => r.numero == selectedRegion);
-        if (region) {
-          region.comunas.forEach(comuna => {
-            const option = document.createElement("option");
-            option.value = comuna.id;
-            option.text = comuna.nombre;
-            comunaSelect.appendChild(option);
-          });
-        }
+      if (!selectedRegionId) return;
+
+      // Buscar la región en el template data
+      const regionesData = {{ regiones_data|tojson }};
+      const region = regionesData.find(r => r.id === selectedRegionId);
+      if (region) {
+        region.comunas.forEach(c => {
+          const option = document.createElement("option");
+          option.value = c.id;
+          option.text = c.nombre;
+          comunaSelect.appendChild(option);
+        });
       }
     }
 
